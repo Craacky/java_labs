@@ -5,6 +5,12 @@ public class ShoppingCentre implements House {
     private int shops;
     private boolean foodCourt;
 
+    public ShoppingCentre(double square, int floors, int shops, boolean foodCourt) {
+        this.square = square;
+        this.floors = floors;
+        this.shops = shops;
+        this.foodCourt = foodCourt;
+    }
 
     @Override
     public void buildHouse() {
@@ -35,7 +41,7 @@ public class ShoppingCentre implements House {
         double newSquare = square * (1 + percent / 100);
         int newShops = (int) Math.round(shops * (1 + percent / 100));
         System.out.println("--------------------------------------------------");
-        System.out.println("Square increase by" + percent + "% from " + square + " sq.m. to " + newSquare + " sq.m.");
+        System.out.println("Square increase by " + percent + "% from " + square + " sq.m. to " + newSquare + " sq.m.");
         System.out.println("Count of shops increase by " + percent + "% from " + shops + " to " + newShops);
 
         square = newSquare;
@@ -54,7 +60,7 @@ public class ShoppingCentre implements House {
     @Override
     public void repair(String room) {
         System.out.println("--------------------------------------------------");
-        System.out.println("Renovation in the office " + room);
+        System.out.println("Renovation in the shop " + room);
         System.out.println("Replaced the floor, furniture and wallpaper");
     }
 

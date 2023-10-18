@@ -41,7 +41,7 @@ public class Office implements House {
         double newSquare = square * (1 + percent / 100);
         int newOffices = (int) Math.round(offices * (1 + percent / 100));
         System.out.println("--------------------------------------------------");
-        System.out.println("Square increase by" + percent + "% from " + square + " sq.m. to " + newSquare + " sq.m.");
+        System.out.println("Square increase by " + percent + "% from " + square + " sq.m. to " + newSquare + " sq.m.");
         System.out.println("Count of offices increase by " + percent + "% from " + offices + " to " + newOffices);
 
         square = newSquare;
