@@ -5,6 +5,7 @@ import java.util.Scanner;
 
 public class User {
     public static int clientId = 0;
+
     public static void clientMenu(Connection connection) throws SQLException {
         Scanner sc = new Scanner(System.in);
         System.out.println("--------------------Hi user!--------------------");
@@ -12,17 +13,18 @@ public class User {
         System.out.println("2. I don't have account.");
         System.out.println("3. Exit.");
         System.out.print("> ");
-        int selector = 0;
-            selector = sc.nextInt();
-            if (selector == 1){
-                checkClientId(connection);
-            } else if (selector == 2) {
-                clientRegistration(connection);
-            }else {
-                System.out.println("BYE!");
-            }
+
+        int selector = sc.nextInt();
+        
+        if (selector == 1) {
+            checkClientId(connection);
+        } else if (selector == 2) {
+            clientRegistration(connection);
+        } else {
+            System.out.println("BYE!");
+        }
         System.out.println("1.Check balance");
-            checkBalance(connection);
+        checkBalance(connection);
     }
 
     public static void clientRegistration(Connection connection) throws SQLException {
@@ -57,22 +59,22 @@ public class User {
         Statement statement = connection.createStatement();
         ResultSet result = statement.executeQuery("SELECT idClient FROM Client WHERE idClient =" + idCheck);
 
-        if (result.first()){
+        if (result.first()) {
             System.out.println("Have a good shopping!");
             clientId = idCheck;
-        }
-        else {
+        } else {
             System.out.println("You are not registered!");
             clientRegistration(connection);
         }
     }
 
-    public static void checkBalance(Connection connection) throws SQLException{
+    public static void checkBalance(Connection connection) throws SQLException {
         Statement stmt = connection.createStatement();
 
         ResultSet rs = stmt.executeQuery("select Balance from Client where idClient =" + clientId);
-        while (rs.next()){
-            System.out.println("Balance " +  rs.getString("Balance"));
+
+        while (rs.next()) {
+            System.out.println("Balance " + rs.getString("Balance"));
         }
     }
 }
