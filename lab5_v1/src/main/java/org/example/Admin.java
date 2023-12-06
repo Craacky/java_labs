@@ -55,29 +55,32 @@ public class Admin {
                     9| Exit""");
             System.out.print("> ");
             pointer = sc.nextInt();
-            if (pointer == 1)
-                insertData(connection, "Cooler");
-
-            if (pointer == 2)
-                insertData(connection, "GraphicCard");
-
-            if (pointer == 3)
-                insertData(connection, "Motherboard");
-
-            if (pointer == 4)
-                insertData(connection, "PowerSupply");
-
-            if (pointer == 5)
-                insertData(connection, "Processor");
-
-            if (pointer == 6)
-                insertData(connection, "RAM");
-
-            if (pointer == 7)
-                insertData(connection, "Storage");
-
-            if (pointer == 8)
-                insertData(connection, "SystemUnit");
+            switch (pointer) {
+                case 1:
+                    insertData(connection, "Cooler");
+                    break;
+                case 2:
+                    insertData(connection, "GraphicCard");
+                    break;
+                case 3:
+                    insertData(connection, "Motherboard");
+                    break;
+                case 4:
+                    insertData(connection, "PowerSupply");
+                    break;
+                case 5:
+                    insertData(connection, "Processor");
+                    break;
+                case 6:
+                    insertData(connection, "RAM");
+                    break;
+                case 7:
+                    insertData(connection, "Storage");
+                    break;
+                case 8:
+                    insertData(connection, "SystemUnit");
+                    break;
+            }
         } while (pointer != 9);
 
     }
