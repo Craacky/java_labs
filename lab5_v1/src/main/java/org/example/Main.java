@@ -21,7 +21,7 @@ public class Main {
 
         int checkPoint = in.nextInt();
 
-        if (checkPoint == 1){
+        if (checkPoint == 1) {
             User.clientMenu(connection);
         } else if (checkPoint == 2) {
             Admin.adminMenu(connection);

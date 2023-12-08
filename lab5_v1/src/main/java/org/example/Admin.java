@@ -107,8 +107,7 @@ public class Admin {
         System.out.println("Table: " + tableName);
         columnsName(connection, tableName);
 
-        System.out.print("Enter id = ");
-        int id = sc.nextInt();
+        int id = SQLPart.idSetter(connection, tableName);
 
         System.out.print("Enter Name = ");
         String name = sc.next();
@@ -116,7 +115,8 @@ public class Admin {
         System.out.print("Enter Price = ");
         double price = sc.nextDouble();
 
-        statement.executeUpdate("insert into shop." + tableName + " values (" + id + ",'" + name + "'," + price + ")");
+        statement.executeUpdate("insert into shop." + tableName +
+                " values (" + id + ",'" + name + "'," + price + ")");
     }
 
 }

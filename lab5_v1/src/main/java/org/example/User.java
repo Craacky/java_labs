@@ -6,17 +6,19 @@ import java.util.Scanner;
 
 public class User {
     public static int clientId = 0;
+    public static int pcIdentify = 0;
+
     public static boolean status = false;
     public static double clientBalance = 0.0;
 
     public static ArrayList<String> tablesName = new ArrayList<>();
-    public static ArrayList<Integer> orderIds = new ArrayList<>();
+    public static ArrayList<Integer> pcId = new ArrayList<>();
 
     public static void clientMenu(Connection connection) throws SQLException {
         Scanner sc = new Scanner(System.in);
         System.out.println("--------------------Hi user!--------------------");
-        System.out.println("1. I am have account.");
-        System.out.println("2. I don't have account.");
+        System.out.println("1. I have an account.");
+        System.out.println("2. I don't have an account.");
         System.out.println("3. Exit.");
         System.out.print("> ");
 
@@ -45,11 +47,9 @@ public class User {
                     depositBalance(connection);
                 } else if (selector == 3) {
                     makeOrder(connection);
+                    insertPcData(connection);
                 }
-
             }
-
-
         }
     }
 
@@ -76,8 +76,7 @@ public class User {
         Scanner in = new Scanner(System.in);
         System.out.println("--------------------Registration--------------------");
 
-        System.out.print("Enter your id = ");
-        int id = in.nextInt();
+        int id = SQLPart.idSetter(connection, "Client");
         clientId = id;
 
         System.out.print("Enter your address = ");
@@ -92,6 +91,9 @@ public class User {
         int result = statement.executeUpdate("insert into Client(idClient,Address,Balance)" + sql);
         if (result > 0) {
             System.out.println("Successfully registration");
+            System.out.println("Your id = " + clientId);
+            System.out.println("Your address = " + address);
+            System.out.println("Your balance = " + balance);
             return true;
         } else {
             System.out.println("Unsuccessful registration");
@@ -117,7 +119,6 @@ public class User {
 
         Statement stmt = connection.createStatement();
         stmt.executeQuery("update Client set Balance =" + clientBalance + " where idClient =" + clientId);
-
     }
 
     public static void tablesName(Connection connection) throws SQLException {
@@ -147,24 +148,34 @@ public class User {
         }
     }
 
-//    public static void insertOrderData(Connection connection, String tableName) throws SQLException {
-//        Statement statement = connection.createStatement();
-//        String values ="(" + ","
-//        String sql = "insert into shop.PC values";
-//        ResultSet rs = statement.executeQuery("");
-//    }
+    public static void insertPcData(Connection connection) throws SQLException {
+        Statement statement = connection.createStatement();
+        String sql1 = "insert into shop.PC values";
+        pcIdentify = SQLPart.idSetter(connection, "PC");
+        String sql2 = "(" + pcIdentify + "," + pcId.get(0) + "," + pcId.get(1) + "," + pcId.get(2) + "," +
+                pcId.get(3) + "," + pcId.get(4) + "," + pcId.get(5) + "," +
+                pcId.get(6) + "," + pcId.get(7) + ")";
+        statement.executeQuery(sql1 + sql2);
+    }
+
 
     public static void makeOrder(Connection connection) throws SQLException {
         tablesName(connection);
         Scanner sc = new Scanner(System.in);
+        System.out.println(SQLPart.idSetter(connection, "Cooler"));
         for (String s : tablesName) {
             System.out.println("Current table " + s);
             showTable(connection, s);
             System.out.println("Choose one by id number");
             System.out.print("> ");
-            orderIds.add(sc.nextInt());
+            pcId.add(sc.nextInt());
+
         }
+
     }
 
+    public static void completeOrder(Connection connection) throws SQLException {
+
+    }
 
 }
