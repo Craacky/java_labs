@@ -59,9 +59,9 @@ public class User {
         int idCheck = in.nextInt();
 
         Statement statement = connection.createStatement();
-        ResultSet result = statement.executeQuery("SELECT idClient FROM Client WHERE idClient =" + idCheck);
+        ResultSet result = statement.executeQuery("SELECT idClient FROM shop.Client WHERE idClient =" + idCheck);
 
-        if (result.first()) {
+        if (result.next()) {
             System.out.println("Have a good shopping!");
             clientId = idCheck;
             return true;
