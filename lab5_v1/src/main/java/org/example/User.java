@@ -1,12 +1,16 @@
 package org.example;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class User {
     public static int clientId = 0;
     public static boolean status = false;
     public static double clientBalance = 0.0;
+
+    public static ArrayList<String> tablesName = new ArrayList<>();
+    public static ArrayList<Integer> orderIds = new ArrayList<>();
 
     public static void clientMenu(Connection connection) throws SQLException {
         Scanner sc = new Scanner(System.in);
@@ -39,6 +43,8 @@ public class User {
                     System.out.println("Current balance = " + checkBalance(connection));
                 } else if (selector == 2) {
                     depositBalance(connection);
+                } else if (selector == 3) {
+                    makeOrder(connection);
                 }
 
             }
@@ -96,8 +102,11 @@ public class User {
 
     public static double checkBalance(Connection connection) throws SQLException {
         Statement stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery("select Balance from Client where idClient =" + clientId);
-        return rs.getDouble("Balance");
+        ResultSet rs = stmt.executeQuery("select Balance from shop.Client where idClient =" + clientId);
+        if (rs.next()) {
+            return rs.getDouble("Balance");
+        }
+        return 0;
     }
 
     public static void depositBalance(Connection connection) throws SQLException {
@@ -110,4 +119,52 @@ public class User {
         stmt.executeQuery("update Client set Balance =" + clientBalance + " where idClient =" + clientId);
 
     }
+
+    public static void tablesName(Connection connection) throws SQLException {
+        Statement statement = connection.createStatement();
+        ResultSet rs = statement.executeQuery("show tables");
+        System.out.println("All tables name");
+        while (rs.next()) {
+            if (!rs.getString(1).equals("Client") &&
+                    !rs.getString(1).equals("Order") &&
+                    !rs.getString(1).equals("PC")
+            ) {
+                tablesName.add(rs.getString(1));
+            }
+        }
+    }
+
+    public static void showTable(Connection connection, String tableName) throws SQLException {
+        Statement statement = connection.createStatement();
+        ResultSet rs = statement.executeQuery("SELECT * FROM shop." + tableName);
+        String format = "|%5s\t| %5s\t | %5s |";
+        System.out.printf((format) + "%n", "ID", "NAME", "PRICE");
+        while (rs.next()) {
+            int id = rs.getInt("id" + tableName);
+            String name = rs.getString("Name");
+            Double price = rs.getDouble("Price");
+            System.out.printf((format) + "%n", id + "", name, price);
+        }
+    }
+
+//    public static void insertOrderData(Connection connection, String tableName) throws SQLException {
+//        Statement statement = connection.createStatement();
+//        String values ="(" + ","
+//        String sql = "insert into shop.PC values";
+//        ResultSet rs = statement.executeQuery("");
+//    }
+
+    public static void makeOrder(Connection connection) throws SQLException {
+        tablesName(connection);
+        Scanner sc = new Scanner(System.in);
+        for (String s : tablesName) {
+            System.out.println("Current table " + s);
+            showTable(connection, s);
+            System.out.println("Choose one by id number");
+            System.out.print("> ");
+            orderIds.add(sc.nextInt());
+        }
+    }
+
+
 }
