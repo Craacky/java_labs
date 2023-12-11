@@ -35,14 +35,17 @@ public class Admin {
         System.out.println("--------------------Server Part--------------------");
         System.out.println("[1] View orders.");
         System.out.println("[2] Top up the components.");
-        System.out.println("[exit]");
+        System.out.println("[exit] [back]");
         System.out.print("Shop:/Admin> ");
         String answer = sc.next();
-        if (answer.equals("1")) {
-
-        } else if (answer.equals("2")) {
-            autoAddComponentsType(connection);
-            topUpComponents(connection);
+        switch (answer) {
+            case "1" -> outputOrder(connection);
+            case "2" -> {
+                autoAddComponentsType(connection);
+                topUpComponents(connection);
+            }
+            case "back" -> SQL.menuGreeter(connection);
+            case "exit" -> System.exit(0);
         }
     }
 
@@ -121,5 +124,33 @@ public class Admin {
         String sqlUpdate = "INSERT INTO component(type_id,name,price)" +
                 " VALUES (" + id + ",'" + name + "'," + price + ")";
         statement.executeUpdate(sqlUpdate);
+    }
+
+    public static void outputOrder(Connection connection) throws SQLException{
+        Statement statement = connection.createStatement();
+        ResultSet rs = statement.executeQuery("""
+                SELECT t1.*, t3.address, t4.name,t4.price, t5.name
+                FROM shop.order t1\s
+                INNER JOIN shop.order_item t2 ON t1.order_id = t2.order_id
+                INNER JOIN shop.client t3 ON t1.clients_id = t3.client_id
+                INNER JOIN shop.component t4 ON t2.component_id = t4.component_id
+                INNER JOIN shop.component_type t5 ON t5.type_id = t4.type_id;""");
+        String format = "%-8s|%-10s|%-20s|%-5s|%-7s|%-50s|%-50s|%-10s|%-14s";
+        System.out.println("ORDER ID|CLIENTS ID|TIMESTAMP           |STATE|PAYMENT|" +
+                "ADDRESS                                           |COMPONENT NAME                                    " +
+                "|PRICE     |COMPONENT TYPE");
+        while (rs.next()){
+            int orderId = rs.getInt("t1.order_id");
+            int clientId = rs.getInt("t1.clients_id");
+            String timeStamp = rs.getString("t1.timestamp");
+            int orderState = rs.getInt("t1.state");
+            int paymentStatus = rs.getInt("t1.payment_status");
+            String status = rs.getString("t3.address");
+            String nameComponent = rs.getString("t4.name");
+            String price = rs.getString("t4.price");
+            String typeComponentName = rs.getString("t5.name");
+            System.out.printf((format) + "%n" , orderId + "",clientId,timeStamp,orderState,paymentStatus,status,nameComponent,price,typeComponentName );
+        }
+
     }
 }

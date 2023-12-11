@@ -21,7 +21,7 @@ public class User {
         System.out.println("--------------------Main Page--------------------");
         System.out.println("[1] I have an account.");
         System.out.println("[2] I don't have an account.");
-        System.out.println("[exit]");
+        System.out.println("[exit] [back]");
         System.out.print("Shop:/Unrecognized> ");
 
         String selector = sc.next();
@@ -29,6 +29,8 @@ public class User {
             status = checkClientExist(connection);
         } else if (selector.equals("2")) {
             status = clientSignUp(connection);
+        } else if (selector.equalsIgnoreCase("back")) {
+            SQL.menuGreeter(connection);
         } else if (selector.equalsIgnoreCase("exit")) {
             System.out.println("BYE!");
         }
@@ -45,7 +47,8 @@ public class User {
             System.out.println("[1] Check balance.");
             System.out.println("[2] Top up your balance.");
             System.out.println("[3] Make order.");
-            System.out.println("[exit]");
+            System.out.println("[4] Pay for my orders.");
+            System.out.println("[exit] [back]");
             System.out.print("Shop:/User> ");
             selector = sc.next();
 
@@ -55,7 +58,9 @@ public class User {
                 topUpClientBalance(connection);
             } else if (selector.equals("3")) {
                 orderFinal(connection);
-            }else if (selector.equalsIgnoreCase("exit")){
+            } else if (selector.equalsIgnoreCase("back")) {
+                clientMenu(connection);
+            } else if (selector.equalsIgnoreCase("exit")){
                 System.exit(0);
             }
         }
@@ -104,7 +109,6 @@ public class User {
                 "'" + clientName + "'," +
                 "'" + clientPassword + "'," +
                 "'" + clientAddress + "')";
-
         Statement statement = connection.createStatement();
 
         int result = statement.executeUpdate(sqlInsert);
@@ -140,13 +144,13 @@ public class User {
         String sqlUpdate = "UPDATE client SET balance =" + clientBalance + " WHERE client_id =" + clientId;
         Statement stmt = connection.createStatement();
 
+
         stmt.executeUpdate(sqlUpdate);
     }
 
     public static void orderFinal(Connection connection) throws SQLException {
         Statement statement = connection.createStatement();
         Scanner sc = new Scanner(System.in);
-        int typePointer = 0;
         int componentPointer;
         ArrayList<Integer> componentId = new ArrayList<>();
         int orderPointer = 0;
@@ -154,8 +158,8 @@ public class User {
         while (orderPointer != 11) {
             orderPointer = orderMenuGreeter(connection);
             if (orderPointer == 10) {
+                statement.executeUpdate("INSERT INTO shop.order(clients_id) VALUES (" + clientId + ")");
                 for (Integer i : componentId) {
-                    statement.executeUpdate("INSERT INTO shop.order(clients_id) VALUES (" + clientId + ")");
                     statement.executeUpdate("INSERT INTO order_item (order_id,component_id) VALUES (" +
                             orderIdFinder(connection) + "," + i + ")");
                 }
@@ -215,7 +219,7 @@ public class User {
 
     public static int orderIdFinder(Connection connection) throws SQLException {
         Statement statement = connection.createStatement();
-        ResultSet rs = statement.executeQuery("SELECT order_id FROM shop.order WHERE clients_id = " + clientId);
+        ResultSet rs = statement.executeQuery("SELECT max(order_id) FROM shop.order  WHERE clients_id = " + clientId);
         if (rs.next()) {
             return rs.getInt(1);
         }
