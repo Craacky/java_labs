@@ -126,30 +126,29 @@ public class Admin {
         statement.executeUpdate(sqlUpdate);
     }
 
-    public static void outputOrder(Connection connection) throws SQLException{
+    public static void outputOrder(Connection connection) throws SQLException {
         Statement statement = connection.createStatement();
         ResultSet rs = statement.executeQuery("""
-                SELECT t1.*, t3.address, t4.name,t4.price, t5.name
+                SELECT t1.*, t3.address, t4.name
                 FROM shop.order t1\s
                 INNER JOIN shop.order_item t2 ON t1.order_id = t2.order_id
                 INNER JOIN shop.client t3 ON t1.clients_id = t3.client_id
                 INNER JOIN shop.component t4 ON t2.component_id = t4.component_id
                 INNER JOIN shop.component_type t5 ON t5.type_id = t4.type_id;""");
-        String format = "%-8s|%-10s|%-20s|%-5s|%-7s|%-50s|%-50s|%-10s|%-14s";
-        System.out.println("ORDER ID|CLIENTS ID|TIMESTAMP           |STATE|PAYMENT|" +
-                "ADDRESS                                           |COMPONENT NAME                                    " +
-                "|PRICE     |COMPONENT TYPE");
-        while (rs.next()){
+        String format = "%-8s|%-10s|%-20s|%-5s|%-7s|%-11s|%-50s|%-50s";
+        System.out.println("ORDER ID|CLIENTS ID|TIMESTAMP           |STATE|PAYMENT|TOTAL PRICE|" +
+                "ADDRESS                                           |COMPONENT NAME                                    ");
+
+        while (rs.next()) {
             int orderId = rs.getInt("t1.order_id");
             int clientId = rs.getInt("t1.clients_id");
             String timeStamp = rs.getString("t1.timestamp");
             int orderState = rs.getInt("t1.state");
             int paymentStatus = rs.getInt("t1.payment_status");
+            double totalPrice = rs.getInt("t1.total_price");
             String status = rs.getString("t3.address");
             String nameComponent = rs.getString("t4.name");
-            String price = rs.getString("t4.price");
-            String typeComponentName = rs.getString("t5.name");
-            System.out.printf((format) + "%n" , orderId + "",clientId,timeStamp,orderState,paymentStatus,status,nameComponent,price,typeComponentName );
+            System.out.printf((format) + "%n", orderId + "", clientId, timeStamp, orderState, paymentStatus,totalPrice, status, nameComponent );
         }
 
     }

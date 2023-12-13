@@ -58,9 +58,11 @@ public class User {
                 topUpClientBalance(connection);
             } else if (selector.equals("3")) {
                 orderFinal(connection);
+            } else if (selector.equals("4")) {
+                payForOrder(connection);
             } else if (selector.equalsIgnoreCase("back")) {
                 clientMenu(connection);
-            } else if (selector.equalsIgnoreCase("exit")){
+            } else if (selector.equalsIgnoreCase("exit")) {
                 System.exit(0);
             }
         }
@@ -154,15 +156,18 @@ public class User {
         int componentPointer;
         ArrayList<Integer> componentId = new ArrayList<>();
         int orderPointer = 0;
-
+        int orderID = 0;
         while (orderPointer != 11) {
             orderPointer = orderMenuGreeter(connection);
             if (orderPointer == 10) {
                 statement.executeUpdate("INSERT INTO shop.order(clients_id) VALUES (" + clientId + ")");
                 for (Integer i : componentId) {
+                    orderID = orderIdFinder(connection);
                     statement.executeUpdate("INSERT INTO order_item (order_id,component_id) VALUES (" +
-                            orderIdFinder(connection) + "," + i + ")");
+                            orderID + "," + i + ")");
                 }
+
+                totalPriceCounter(connection, componentId, orderID);
             } else if (orderPointer > 0 && orderPointer < 10) {
                 System.out.println("--------------------Choose by id--------------------");
                 showTable(connection, typeComponentsNames.get(orderPointer - 1));
@@ -225,4 +230,57 @@ public class User {
         }
         return 0;
     }
+
+    public static void payForOrder(Connection connection) throws SQLException {
+        Scanner sc = new Scanner(System.in);
+        Statement statement = connection.createStatement();
+        System.out.println("Your orders:");
+        ResultSet rs = statement.executeQuery("""
+                SELECT t1.*, t3.address, t4.name
+                FROM shop.order t1\s
+                INNER JOIN shop.order_item t2 ON t1.order_id = t2.order_id
+                INNER JOIN shop.client t3 ON t1.clients_id = t3.client_id
+                INNER JOIN shop.component t4 ON t2.component_id = t4.component_id
+                INNER JOIN shop.component_type t5 ON t5.type_id = t4.type_id where t1.clients_id = """ + clientId);
+        String format = "%-8s|%-10s|%-20s|%-5s|%-7s|%-11s|%-50s|%-50s";
+        System.out.println("ORDER ID|CLIENTS ID|TIMESTAMP           |STATE|PAYMENT|TOTAL PRICE|" +
+                "ADDRESS                                           |COMPONENT NAME                                    ");
+
+        while (rs.next()) {
+            int orderId = rs.getInt("t1.order_id");
+            int clientId = rs.getInt("t1.clients_id");
+            String timeStamp = rs.getString("t1.timestamp");
+            int orderState = rs.getInt("t1.state");
+            int paymentStatus = rs.getInt("t1.payment_status");
+            double totalPrice = rs.getInt("t1.total_price");
+            String status = rs.getString("t3.address");
+            String nameComponent = rs.getString("t4.name");
+            System.out.println("______________________________________________________________________________________" +
+                    "_______________________________________________________________________" +
+                    "________________________________");
+            System.out.printf((format) + "%n", orderId + "", clientId, timeStamp,
+                    orderState, paymentStatus, totalPrice, status, nameComponent);
+            System.out.println("______________________________________________________________________________________" +
+                    "_________________________________________________________________" +
+                    "______________________________________");
+        }
+        System.out.print("Choose by order id>");
+        sc.nextInt();
+    }
+
+    public static double totalPrice = 0;
+
+    public static void totalPriceCounter(Connection connection, ArrayList<Integer> data, int orderId) throws SQLException {
+        Statement statement = connection.createStatement();
+        String sqlSelect = "SELECT price FROM shop.component where component_id = ";
+        for (Object id : data) {
+            ResultSet rs = statement.executeQuery(sqlSelect + id);
+            if (rs.next()) {
+                totalPrice += rs.getDouble("price");
+            }
+        }
+        statement.executeUpdate("UPDATE shop.order SET total_price = " + totalPrice +
+                "WHERE order_id = " + orderId);
+    }
+
 }
