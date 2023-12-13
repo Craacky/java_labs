@@ -206,7 +206,7 @@ public class User {
         ResultSet rs = statement.executeQuery("SELECT t2.component_id,t2.name, t2.price, t1.name " +
                 "FROM component_type t1 " +
                 "INNER JOIN component t2 " +
-                "ON t1.type_id = t2.type_id where t1.name = '" + typeName + "'");
+                "ON t1.type_id = t2.type_id where t1.name = '" + typeName + "' order by t2.price");
 
 
         String format = "%-8s|%-37s|%-16s|%-21s ";
@@ -241,13 +241,14 @@ public class User {
                 INNER JOIN shop.order_item t2 ON t1.order_id = t2.order_id
                 INNER JOIN shop.client t3 ON t1.clients_id = t3.client_id
                 INNER JOIN shop.component t4 ON t2.component_id = t4.component_id
-                INNER JOIN shop.component_type t5 ON t5.type_id = t4.type_id where t1.clients_id = """ + clientId);
+                INNER JOIN shop.component_type t5 ON t5.type_id = t4.type_id where t1.clients_id =\s""" + clientId + " and t1.payment_status = 0");
         String format = "%-8s|%-10s|%-20s|%-5s|%-7s|%-11s|%-50s|%-50s";
         System.out.println("ORDER ID|CLIENTS ID|TIMESTAMP           |STATE|PAYMENT|TOTAL PRICE|" +
                 "ADDRESS                                           |COMPONENT NAME                                    ");
 
+        int orderId = 0;
         while (rs.next()) {
-            int orderId = rs.getInt("t1.order_id");
+            orderId = rs.getInt("t1.order_id");
             int clientId = rs.getInt("t1.clients_id");
             String timeStamp = rs.getString("t1.timestamp");
             int orderState = rs.getInt("t1.state");
@@ -264,8 +265,13 @@ public class User {
                     "_________________________________________________________________" +
                     "______________________________________");
         }
-        System.out.print("Choose by order id>");
-        sc.nextInt();
+        if (orderId > 0){
+            System.out.print("Choose by order id>");
+            purchaseOrder(connection, sc.nextInt());
+        }else {
+            System.out.println("Order list empty");
+        }
+
     }
 
     public static double totalPrice = 0;
@@ -283,4 +289,25 @@ public class User {
                 "WHERE order_id = " + orderId);
     }
 
+    public static void purchaseOrder(Connection connection, int orderId) throws SQLException {
+        Statement statement = connection.createStatement();
+        ResultSet rs = statement.executeQuery("SELECT total_price FROM shop.order where order_id = " + orderId);
+        double priceOrder = 0;
+        if (rs.next()) {
+            priceOrder = rs.getDouble("total_price");
+        } else {
+            System.out.println("wrong order id");
+        }
+        double clientBalance = checkClientBalance(connection);
+        double result;
+        if (priceOrder < clientBalance) {
+            result = clientBalance - priceOrder;
+            statement.executeUpdate("UPDATE shop.order SET payment_status = 1");
+            statement.executeUpdate("UPDATE shop.client SET balance = " + result + " WHERE client_id = " + clientId);
+        } else {
+            System.out.println("Don't enough money=)");
+        }
+
+
+    }
 }

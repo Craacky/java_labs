@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -35,6 +37,7 @@ public class Admin {
         System.out.println("--------------------Server Part--------------------");
         System.out.println("[1] View orders.");
         System.out.println("[2] Top up the components.");
+        System.out.println("[3] Change order status.");
         System.out.println("[exit] [back]");
         System.out.print("Shop:/Admin> ");
         String answer = sc.next();
@@ -44,9 +47,25 @@ public class Admin {
                 autoAddComponentsType(connection);
                 topUpComponents(connection);
             }
+            case "3" -> changeOrderStatus(connection);
             case "back" -> SQL.menuGreeter(connection);
             case "exit" -> System.exit(0);
         }
+    }
+
+    public static void changeOrderStatus(Connection connection) throws SQLException {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+
+
+        Scanner sc = new Scanner(System.in);
+        outputOrder(connection);
+        System.out.println("Current date " + dtf.format(now));
+        System.out.println("Choose deprecated order:");
+        System.out.print("Shop:/Admin/SetDeprecated>");
+        int orderId = sc.nextInt();
+        Statement statement = connection.createStatement();
+        statement.executeUpdate("UPDATE shop.order SET state = 1 where order_id = " + orderId);
     }
 
     public static void autoAddComponentsType(Connection connection) throws SQLException {
@@ -134,7 +153,7 @@ public class Admin {
                 INNER JOIN shop.order_item t2 ON t1.order_id = t2.order_id
                 INNER JOIN shop.client t3 ON t1.clients_id = t3.client_id
                 INNER JOIN shop.component t4 ON t2.component_id = t4.component_id
-                INNER JOIN shop.component_type t5 ON t5.type_id = t4.type_id;""");
+                INNER JOIN shop.component_type t5 ON t5.type_id = t4.type_id ORDER BY t1.timestamp;""");
         String format = "%-8s|%-10s|%-20s|%-5s|%-7s|%-11s|%-50s|%-50s";
         System.out.println("ORDER ID|CLIENTS ID|TIMESTAMP           |STATE|PAYMENT|TOTAL PRICE|" +
                 "ADDRESS                                           |COMPONENT NAME                                    ");
@@ -148,7 +167,7 @@ public class Admin {
             double totalPrice = rs.getInt("t1.total_price");
             String status = rs.getString("t3.address");
             String nameComponent = rs.getString("t4.name");
-            System.out.printf((format) + "%n", orderId + "", clientId, timeStamp, orderState, paymentStatus,totalPrice, status, nameComponent );
+            System.out.printf((format) + "%n", orderId + "", clientId, timeStamp, orderState, paymentStatus, totalPrice, status, nameComponent);
         }
 
     }
