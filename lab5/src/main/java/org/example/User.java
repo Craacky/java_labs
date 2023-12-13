@@ -1,5 +1,6 @@
 package org.example;
 
+import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -7,8 +8,20 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class User {
+    static Logger LOGGER;
+    static {
+        try(FileInputStream ins = new FileInputStream("/home/craacky/Projects/java_labs/lab5/log.config")){
+            LogManager.getLogManager().readConfiguration(ins);
+            LOGGER = Logger.getLogger(Main.class.getName());
+        }catch (Exception ignore){
+            ignore.printStackTrace();
+        }
+    }
     public static int clientId;
 
     public static double clientBalance;
@@ -16,6 +29,8 @@ public class User {
     public static ArrayList<String> typeComponentsNames = new ArrayList<>();
 
     public static void clientMenu(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"Client part start");
+
         Scanner sc = new Scanner(System.in);
         boolean status = false;
         System.out.println("--------------------Main Page--------------------");
@@ -23,6 +38,7 @@ public class User {
         System.out.println("[2] I don't have an account.");
         System.out.println("[exit] [back]");
         System.out.print("Shop:/Unrecognized> ");
+
 
         String selector = sc.next();
         if (selector.equals("1")) {
@@ -40,6 +56,8 @@ public class User {
     }
 
     public static void clientShoppingSection(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"Client Shopping section start");
+
         Scanner sc = new Scanner(System.in);
         String selector = null;
         while (!Objects.equals(selector, "exit")) {
@@ -69,6 +87,8 @@ public class User {
     }
 
     public static boolean checkClientExist(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"Client check if client exist");
+
         Scanner in = new Scanner(System.in);
         System.out.println("--------------------Sign in--------------------");
         System.out.print("Nick: ");
@@ -96,6 +116,7 @@ public class User {
     }
 
     public static boolean clientSignUp(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"Client signup");
         Scanner in = new Scanner(System.in);
         System.out.println("--------------------Sign Up--------------------");
 
@@ -125,6 +146,8 @@ public class User {
 
 
     public static double checkClientBalance(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"Check client balance ");
+
         Statement stmt = connection.createStatement();
         String sqlSelect = "SELECT balance FROM client WHERE client_id =" +
                 clientId;
@@ -137,6 +160,8 @@ public class User {
     }
 
     public static void topUpClientBalance(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"top up client balance");
+
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Enter value of deposit: ");
@@ -151,6 +176,8 @@ public class User {
     }
 
     public static void orderFinal(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"Complete order");
+
         Statement statement = connection.createStatement();
         Scanner sc = new Scanner(System.in);
         int componentPointer;
@@ -181,6 +208,8 @@ public class User {
     }
 
     public static int orderMenuGreeter(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"Order menu greeter");
+
         Scanner sc = new Scanner(System.in);
         System.out.println("--------------------Choose one for order--------------------");
         componentTypeNameGetter(connection);
@@ -191,6 +220,8 @@ public class User {
     }
 
     public static void componentTypeNameGetter(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"component type name getter");
+
         Statement statement = connection.createStatement();
         ResultSet rs = statement.executeQuery("SELECT name FROM component_type ORDER BY type_id");
         int index = 1;
@@ -202,6 +233,7 @@ public class User {
     }
 
     public static void showTable(Connection connection, String typeName) throws SQLException {
+        LOGGER.log(Level.INFO,"show order items table");
         Statement statement = connection.createStatement();
         ResultSet rs = statement.executeQuery("SELECT t2.component_id,t2.name, t2.price, t1.name " +
                 "FROM component_type t1 " +
@@ -223,6 +255,8 @@ public class User {
 
 
     public static int orderIdFinder(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"Order id finder");
+
         Statement statement = connection.createStatement();
         ResultSet rs = statement.executeQuery("SELECT max(order_id) FROM shop.order  WHERE clients_id = " + clientId);
         if (rs.next()) {
@@ -232,6 +266,8 @@ public class User {
     }
 
     public static void payForOrder(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"Pay for order");
+
         Scanner sc = new Scanner(System.in);
         Statement statement = connection.createStatement();
         System.out.println("Your orders:");
@@ -277,6 +313,8 @@ public class User {
     public static double totalPrice = 0;
 
     public static void totalPriceCounter(Connection connection, ArrayList<Integer> data, int orderId) throws SQLException {
+        LOGGER.log(Level.INFO,"Price counter");
+
         Statement statement = connection.createStatement();
         String sqlSelect = "SELECT price FROM shop.component where component_id = ";
         for (Object id : data) {
@@ -290,6 +328,7 @@ public class User {
     }
 
     public static void purchaseOrder(Connection connection, int orderId) throws SQLException {
+        LOGGER.log(Level.INFO,"Order purchase");
         Statement statement = connection.createStatement();
         ResultSet rs = statement.executeQuery("SELECT total_price FROM shop.order where order_id = " + orderId);
         double priceOrder = 0;

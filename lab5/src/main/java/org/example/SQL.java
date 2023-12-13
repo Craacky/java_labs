@@ -1,7 +1,11 @@
 package org.example;
 
+import java.io.FileInputStream;
 import java.sql.*;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class SQL {
     public static Connection getNewConnection() throws SQLException {

@@ -1,5 +1,6 @@
 package org.example;
 
+import java.io.FileInputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,8 +9,22 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class Admin {
+    static Logger LOGGER;
+
+    static {
+        try (FileInputStream ins = new FileInputStream("/home/craacky/Projects/java_labs/lab5/log.config")) {
+            LogManager.getLogManager().readConfiguration(ins);
+            LOGGER = Logger.getLogger(Main.class.getName());
+        } catch (Exception ignore) {
+            ignore.printStackTrace();
+        }
+    }
+
     public static String name = "1";
     public static String passwd = "1";
     public static ArrayList<Integer> typeComponentsId = new ArrayList<>();
@@ -23,6 +38,8 @@ public class Admin {
     }
 
     public static boolean adminSignIn() {
+        LOGGER.log(Level.INFO,"Admin sign up");
+
         Scanner sc = new Scanner(System.in);
         System.out.println("--------------------Hi Admin!--------------------");
         System.out.print("Nick: ");
@@ -33,6 +50,8 @@ public class Admin {
     }
 
     public static void serverPartMenu(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"Admin menu ");
+
         Scanner sc = new Scanner(System.in);
         System.out.println("--------------------Server Part--------------------");
         System.out.println("[1] View orders.");
@@ -54,6 +73,8 @@ public class Admin {
     }
 
     public static void changeOrderStatus(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"Admin change order status");
+
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
 
@@ -69,6 +90,7 @@ public class Admin {
     }
 
     public static void autoAddComponentsType(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"Component type loader");
         Statement statement = connection.createStatement();
         ResultSet result = statement.executeQuery("SELECT * FROM component_type");
         if (result.next()) {
@@ -101,6 +123,7 @@ public class Admin {
     }
 
     public static void componentTypeNameGetter(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"Component type name getter");
         Statement statement = connection.createStatement();
         ResultSet rs = statement.executeQuery("SELECT name FROM component_type ORDER BY type_id");
         int index = 1;
@@ -112,6 +135,7 @@ public class Admin {
     }
 
     public static void topUpComponents(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"Top up components");
         Scanner sc = new Scanner(System.in);
 
         int pointer;
@@ -131,6 +155,7 @@ public class Admin {
     }
 
     public static void insertData(Connection connection, int id) throws SQLException {
+
         Statement statement = connection.createStatement();
         Scanner sc = new Scanner(System.in);
         System.out.println("--------------------Replenish--------------------");
@@ -146,6 +171,8 @@ public class Admin {
     }
 
     public static void outputOrder(Connection connection) throws SQLException {
+        LOGGER.log(Level.INFO,"Order printed");
+
         Statement statement = connection.createStatement();
         ResultSet rs = statement.executeQuery("""
                 SELECT t1.*, t3.address, t4.name
