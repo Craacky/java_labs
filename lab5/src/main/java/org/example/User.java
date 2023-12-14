@@ -1,6 +1,7 @@
 package org.example;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,7 +29,7 @@ public class User {
 
     public static ArrayList<String> typeComponentsNames = new ArrayList<>();
 
-    public static void clientMenu(Connection connection) throws SQLException {
+    public static void clientMenu(Connection connection) throws SQLException, IOException {
         LOGGER.log(Level.INFO,"Client part start");
 
         Scanner sc = new Scanner(System.in);
@@ -55,7 +56,7 @@ public class User {
         }
     }
 
-    public static void clientShoppingSection(Connection connection) throws SQLException {
+    public static void clientShoppingSection(Connection connection) throws SQLException, IOException {
         LOGGER.log(Level.INFO,"Client Shopping section start");
 
         Scanner sc = new Scanner(System.in);
@@ -175,7 +176,7 @@ public class User {
         stmt.executeUpdate(sqlUpdate);
     }
 
-    public static void orderFinal(Connection connection) throws SQLException {
+    public static void orderFinal(Connection connection) throws SQLException, IOException {
         LOGGER.log(Level.INFO,"Complete order");
 
         Statement statement = connection.createStatement();

@@ -1,26 +1,6 @@
-Dec 14, 2023 1:04:46 AM org.example.User clientMenu
-INFO: Client part start
-Dec 14, 2023 1:04:48 AM org.example.User checkClientExist
-INFO: Client check if client exist
-Dec 14, 2023 1:04:51 AM org.example.User clientShoppingSection
-INFO: Client Shopping section start
-Dec 14, 2023 1:04:52 AM org.example.User payForOrder
-INFO: Pay for order
-Dec 14, 2023 1:04:55 AM org.example.User checkClientBalance
-INFO: Check client balance 
-Dec 14, 2023 1:04:57 AM org.example.User topUpClientBalance
-INFO: top up client balance
-Dec 14, 2023 1:04:58 AM org.example.User checkClientBalance
-INFO: Check client balance 
-Dec 14, 2023 1:05:01 AM java.lang.Shutdown logRuntimeExit
-FINE: Runtime.exit() called with status: 0
-java.lang.Throwable: Runtime.exit(0)
-	at java.base/java.lang.Shutdown.logRuntimeExit(Shutdown.java:179)
-	at java.base/java.lang.Shutdown.exit(Shutdown.java:160)
-	at java.base/java.lang.Runtime.exit(Runtime.java:188)
-	at java.base/java.lang.System.exit(System.java:1916)
-	at org.example.User.clientShoppingSection(User.java:84)
-	at org.example.User.clientMenu(User.java:54)
-	at org.example.SQL.menuGreeter(SQL.java:29)
-	at org.example.Main.main(Main.java:24)
-
+Dec 14, 2023 10:54:16 AM org.example.Admin adminSignIn
+INFO: Admin sign up
+Dec 14, 2023 10:54:17 AM org.example.Admin serverPartMenu
+INFO: Admin menu 
+Dec 14, 2023 10:54:19 AM org.example.Admin csvGetter
+INFO: Created csv file

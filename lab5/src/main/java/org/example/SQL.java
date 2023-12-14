@@ -1,11 +1,10 @@
 package org.example;
 
-import java.io.FileInputStream;
-import java.sql.*;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 public class SQL {
     public static Connection getNewConnection() throws SQLException {
@@ -15,7 +14,7 @@ public class SQL {
         return DriverManager.getConnection(url, user, passwd);
     }
 
-    public static void menuGreeter(Connection connection) throws SQLException {
+    public static void menuGreeter(Connection connection) throws SQLException, IOException {
         Scanner in = new Scanner(System.in);
         System.out.println("--------------------Who you are ?--------------------");
         System.out.println("[1] I am user!");

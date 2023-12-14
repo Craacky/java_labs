@@ -1,6 +1,7 @@
 package org.example;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -8,6 +9,7 @@ import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -29,7 +31,7 @@ public class Admin {
     public static String passwd = "1";
     public static ArrayList<Integer> typeComponentsId = new ArrayList<>();
 
-    public static void adminMenu(Connection connection) throws SQLException {
+    public static void adminMenu(Connection connection) throws SQLException, IOException {
         boolean status = adminSignIn();
         if (status) {
             serverPartMenu(connection);
@@ -38,7 +40,7 @@ public class Admin {
     }
 
     public static boolean adminSignIn() {
-        LOGGER.log(Level.INFO,"Admin sign up");
+        LOGGER.log(Level.INFO, "Admin sign up");
 
         Scanner sc = new Scanner(System.in);
         System.out.println("--------------------Hi Admin!--------------------");
@@ -49,14 +51,15 @@ public class Admin {
         return nick.equals(name) && passwd.equals(password);
     }
 
-    public static void serverPartMenu(Connection connection) throws SQLException {
-        LOGGER.log(Level.INFO,"Admin menu ");
+    public static void serverPartMenu(Connection connection) throws SQLException, IOException {
+        LOGGER.log(Level.INFO, "Admin menu ");
 
         Scanner sc = new Scanner(System.in);
         System.out.println("--------------------Server Part--------------------");
         System.out.println("[1] View orders.");
         System.out.println("[2] Top up the components.");
         System.out.println("[3] Change order status.");
+        System.out.println("[4] Get csv file");
         System.out.println("[exit] [back]");
         System.out.print("Shop:/Admin> ");
         String answer = sc.next();
@@ -67,13 +70,30 @@ public class Admin {
                 topUpComponents(connection);
             }
             case "3" -> changeOrderStatus(connection);
+            case "4" -> csvGetter(connection);
             case "back" -> SQL.menuGreeter(connection);
             case "exit" -> System.exit(0);
         }
     }
 
+    public static void csvGetter(Connection connection) throws SQLException, IOException {
+        LOGGER.log(Level.INFO, "Created csv file");
+        List<String[]> orderTableRows = Csv.orderTableGetter(connection);
+        List<String> resultCsv = new ArrayList<>();
+        for (String[] stringPointer : orderTableRows) {
+            String csvString = Csv.convertToCsvString(stringPointer[0],
+                    stringPointer[1],
+                    stringPointer[2],
+                    stringPointer[3],
+                    stringPointer[4],
+                    stringPointer[5]);
+            resultCsv.add(csvString);
+        }
+        Csv.writeStringsToCsv(resultCsv);
+    }
+
     public static void changeOrderStatus(Connection connection) throws SQLException {
-        LOGGER.log(Level.INFO,"Admin change order status");
+        LOGGER.log(Level.INFO, "Admin change order status");
 
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
@@ -90,7 +110,7 @@ public class Admin {
     }
 
     public static void autoAddComponentsType(Connection connection) throws SQLException {
-        LOGGER.log(Level.INFO,"Component type loader");
+        LOGGER.log(Level.INFO, "Component type loader");
         Statement statement = connection.createStatement();
         ResultSet result = statement.executeQuery("SELECT * FROM component_type");
         if (result.next()) {
@@ -123,7 +143,7 @@ public class Admin {
     }
 
     public static void componentTypeNameGetter(Connection connection) throws SQLException {
-        LOGGER.log(Level.INFO,"Component type name getter");
+        LOGGER.log(Level.INFO, "Component type name getter");
         Statement statement = connection.createStatement();
         ResultSet rs = statement.executeQuery("SELECT name FROM component_type ORDER BY type_id");
         int index = 1;
@@ -134,8 +154,8 @@ public class Admin {
         }
     }
 
-    public static void topUpComponents(Connection connection) throws SQLException {
-        LOGGER.log(Level.INFO,"Top up components");
+    public static void topUpComponents(Connection connection) throws SQLException, IOException {
+        LOGGER.log(Level.INFO, "Top up components");
         Scanner sc = new Scanner(System.in);
 
         int pointer;
@@ -171,7 +191,7 @@ public class Admin {
     }
 
     public static void outputOrder(Connection connection) throws SQLException {
-        LOGGER.log(Level.INFO,"Order printed");
+        LOGGER.log(Level.INFO, "Order printed");
 
         Statement statement = connection.createStatement();
         ResultSet rs = statement.executeQuery("""
@@ -198,4 +218,5 @@ public class Admin {
         }
 
     }
+
 }
